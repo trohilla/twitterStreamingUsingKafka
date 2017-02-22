@@ -35,10 +35,10 @@ public class TwitterStreamProducer {
 	public void run(String topicName,String filter)
 			throws InterruptedException {
 		
-		String consumerKey = "7OOHTBQOCmxVEdvwlpeX34DZP";
-		String consumerSecret = "q4B5gV4MkWyykNSbpMspd5jTRAxf1DaceNJ32ENQknUGjNJMA9";
-		String token = "260644023-aDKdyhJrxyYBw35cDW34Z61svXwNQ2s1oCwuEp0U";
-		String secret = "uZOTl81gmkeIoxVzkiH6zzH77GwIWYtQN16XnorPQXw7Y";
+		String consumerKey = "";
+		String consumerSecret = "";
+		String token = "";
+		String secret = "";
 		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 		// add some track terms
