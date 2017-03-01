@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="/static/JS/jquery-3.1.1.min.js"></script>
+<script src="/static/JS/charts/amcharts/amcharts.js"></script>
+<script src="/static/JS/charts/amcharts/serial.js"></script>
+<script type="text/javascript">
+	var xmlhttp;
+	var data;
+	function init() {
+		// put more code here in case you are concerned about browsers that do not provide XMLHttpRequest object directly
+		xmlhttp = new XMLHttpRequest();
+	}
+	function getTwitterData() {
+		var topic = document.getElementById("topic-name");
+		var url = "http://localhost:9099/getTwitterAnalysis/" + topic.value;
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4) {
+				if (xmlhttp.status == 200) {
+					data = JSON.parse(xmlhttp.responseText);
+					makeChart(data);
+				}
+			}
+		}
+		xmlhttp.open('GET', url, true);
+		xmlhttp.send(null);
+	};//end of getTwitterData
+
+	function makeChart(data) {
+		AmCharts.makeChart("chartdiv", {
+			"type" : "serial",
+			"dataProvider" : data,
+			"categoryField" : "location",
+			"graphs" : [ {
+				"valueField" : "count",
+				"type" : "column"
+			} ]
+		});//end of makeChart
+
+		function startData() {
+			myVar = setInterval(getTwitterData, 5000);//end of setInterval
+		}
+		;//end of start
+	}
+</script>
+</head>
+<body onload="init()">
+	<h1>Get Twitter Analysis</h1>
+	<input type="text" id="topic-name" name="topicName" />
+	<input type="button" id="button" value="Get Twitter Data"
+		onclick="setInterval(getTwitterData, 20000)" />
+	<div id="chartdiv" style="width: 1280px; height: 400px;"></div>
+	<div align="center" hidden="false" id="data">
+		<table border="1" id="mytable">
+			<tbody>
+				<tr>
+					<th>Location</th>
+					<th>Count</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
