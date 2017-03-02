@@ -5,25 +5,35 @@
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-	           http://www.springframework.org/schema/mvc
-                           http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 	<mvc:annotation-driven />
-		<!-- Root Context: defines shared resources visible to all other web components -->
 
-		<!-- Configure to plugin JSON as request and response in method handler -->
-		<bean
-			class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
-			<property name="messageConverters">
-				<list>
-					<ref bean="jsonMessageConverter" />
-				</list>
-			</property>
-		</bean>
+	<mvc:resources mapping="/static/**" location="/static/" />
+ 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+		in the /WEB-INF/views directory 
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean> -->
+	<context:annotation-config />
+	<bean name="streamService" class="com.tushar.kafka.twitter.KafkaTwitterStreamConsumer" />
+	
+	<!-- Configure to plugin JSON as request and response in method handler -->
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="jsonMessageConverter" />
+			</list>
+		</property>
+	</bean>
 
-		<!-- Configure bean to convert JSON to POJO and vice versa -->
-		<bean id="jsonMessageConverter"
-			class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-		</bean>
-		<context:component-scan base-package="com.tushar.kafka" />
+	<!-- Configure bean to convert JSON to POJO and vice versa -->
+	<bean id="jsonMessageConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	</bean>
+
+	<context:component-scan base-package="com.tushar.kafka" />
 </beans>

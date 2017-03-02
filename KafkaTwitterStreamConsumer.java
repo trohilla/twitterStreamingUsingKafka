@@ -24,7 +24,6 @@ public class KafkaTwitterStreamConsumer {
 
 	private String groupName = "SimpleTopicGroup";
 	private ConsumerConnector consumerConnector = null;
-	//private static List<String> list = new ArrayList<>();
 
 	/**
 	 * To initialize the property and consumerConnector object, so as to consume
@@ -84,7 +83,7 @@ public class KafkaTwitterStreamConsumer {
 	private static String parseByteArray(byte[] array) {
 		String value = Arrays.toString(array);
 		return new String(value.substring(1, value.length() - 1)
-				.replaceAll(",", "").replaceAll("\\s+", "").trim());
+				.replaceAll(",", "").replaceAll("-", "").replaceAll("\\s+", "").trim());
 	}
 
 	/**

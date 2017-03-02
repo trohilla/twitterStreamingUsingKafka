@@ -10,6 +10,7 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
+import org.apache.kafka.streams.kstream.KTable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -46,10 +47,10 @@ public class TwitterStream {
 
 		// KStream<String, Object> mapped=source.mapValues(record ->
 		// Integer.valueOf(record.length()).toString());
-		KStream<String, Long> counts = source.flatMapValues(TwitterStream::parseAndGetData)
+		KTable<String,Long> counts = source.flatMapValues(TwitterStream::parseAndGetData)
 				.filter((key,value)->(key!=null))
 				.map((key, word) -> new KeyValue(word, word))
-				.groupBy((k, v) -> k).count("Counts").toStream();
+				.groupBy((k, v) -> k).count("Counts");
 		counts.foreach(TwitterStream::populateLocations);
 
 		// need to override value serde to Long type

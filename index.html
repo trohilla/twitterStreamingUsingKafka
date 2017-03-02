@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet" href="style.css" type="text/css">
 <script type="text/javascript" src="/static/JS/jquery-3.1.1.min.js"></script>
 <script src="/static/JS/charts/amcharts/amcharts.js"></script>
 <script src="/static/JS/charts/amcharts/serial.js"></script>
+<script src="/static/JS/zing/zingchart.min.js"></script>
 <script type="text/javascript">
 	var xmlhttp;
 	var data;
+        var chart;
 	function init() {
 		// put more code here in case you are concerned about browsers that do not provide XMLHttpRequest object directly
 		xmlhttp = new XMLHttpRequest();
@@ -39,10 +42,123 @@
 			} ]
 		});//end of makeChart
 
-		function startData() {
-			myVar = setInterval(getTwitterData, 5000);//end of setInterval
-		}
-		;//end of start
+            AmCharts.ready(function () {
+                // SERIAL CHART
+                chart = new AmCharts.AmSerialChart();
+                chart.dataProvider = data;
+                chart.categoryField = "date";
+                chart.dataDateFormat = "YYYY-MM-DD";
+                chart.marginTop = 0;
+
+                // AXES
+                // category axis
+                var categoryAxis = chart.categoryAxis;
+                categoryAxis.parseDates = true; // as our data is date-based, we set parseDates to true
+                categoryAxis.minPeriod = "DD"; // our data is daily, so we set minPeriod to DD
+                categoryAxis.autoGridCount = false;
+                categoryAxis.gridCount = 50;
+                categoryAxis.gridAlpha = 0;
+                categoryAxis.gridColor = "#000000";
+                categoryAxis.axisColor = "#555555";
+                // we want custom date formatting, so we change it in next line
+                categoryAxis.dateFormats = [{
+                    period: 'DD',
+                    format: 'DD'
+                }, {
+                    period: 'WW',
+                    format: 'MMM DD'
+                }, {
+                    period: 'MM',
+                    format: 'MMM'
+                }, {
+                    period: 'YYYY',
+                    format: 'YYYY'
+                }];
+
+                // as we have data of different units, we create two different value axes
+                // Duration value axis
+                var durationAxis = new AmCharts.ValueAxis();
+                durationAxis.title = "duration";
+                durationAxis.gridAlpha = 0.05;
+                durationAxis.axisAlpha = 0;
+                durationAxis.tickLength = 0;
+                durationAxis.inside = true;
+                // the following line makes this value axis to convert values to duration
+                // it tells the axis what duration unit it should use. mm - minute, hh - hour...
+                durationAxis.duration = "mm";
+                durationAxis.durationUnits = {
+                    DD: "d. ",
+                    hh: "h ",
+                    mm: "min",
+                    ss: ""
+                };
+                chart.addValueAxis(durationAxis);
+
+                // Distance value axis
+                var distanceAxis = new AmCharts.ValueAxis();
+                distanceAxis.title = "distance";
+                distanceAxis.gridAlpha = 0;
+                distanceAxis.position = "right";
+                distanceAxis.inside = true;
+                distanceAxis.unit = "mi";
+                distanceAxis.axisAlpha = 0;
+                distanceAxis.tickLength = 0;
+                chart.addValueAxis(distanceAxis);
+
+                // GRAPHS
+                // duration graph
+                var durationGraph = new AmCharts.AmGraph();
+                durationGraph.title = "duration";
+                durationGraph.valueField = "duration";
+                durationGraph.type = "line";
+                durationGraph.valueAxis = durationAxis; // indicate which axis should be used
+                durationGraph.lineColor = "#CC0000";
+                durationGraph.balloonText = "[[value]]";
+                durationGraph.lineThickness = 1;
+                durationGraph.legendValueText = "[[value]]";
+                durationGraph.bullet = "square";
+                durationGraph.bulletBorderColor = "#CC0000";
+                durationGraph.bulletBorderAlpha = 1;
+                durationGraph.bulletBorderThickness = 1;
+                chart.addGraph(durationGraph);
+
+                // distance graph
+                var distanceGraph = new AmCharts.AmGraph();
+                distanceGraph.valueField = "distance";
+                distanceGraph.title = "distance";
+                distanceGraph.type = "column";
+                distanceGraph.fillAlphas = 0.1;
+                distanceGraph.valueAxis = distanceAxis; // indicate which axis should be used
+                distanceGraph.balloonText = "[[value]] miles";
+                distanceGraph.legendValueText = "[[value]] mi";
+                distanceGraph.legendPeriodValueText = "total: [[value.sum]] mi";
+                distanceGraph.lineColor = "#000000";
+                distanceGraph.lineAlpha = 0;
+                chart.addGraph(distanceGraph);
+
+                // CURSOR
+                var chartCursor = new AmCharts.ChartCursor();
+                chartCursor.zoomable = false;
+                chartCursor.categoryBalloonDateFormat = "DD";
+                chartCursor.cursorAlpha = 0;
+                chartCursor.valueLineEnabled = true;
+                chartCursor.valueLineBalloonEnabled = true;
+                chartCursor.valueLineAxis = distanceAxis;
+                chart.addChartCursor(chartCursor);
+
+                // LEGEND
+                var legend = new AmCharts.AmLegend();
+                legend.bulletType = "round";
+                legend.equalWidths = false;
+                legend.valueWidth = 120;
+                legend.color = "#000000";
+                legend.useGraphSettings = true;
+                chart.addLegend(legend);
+
+                // WRITE
+                chart.write("linediv");
+            });
+
 	}
 </script>
 </head>
@@ -50,17 +166,9 @@
 	<h1>Get Twitter Analysis</h1>
 	<input type="text" id="topic-name" name="topicName" />
 	<input type="button" id="button" value="Get Twitter Data"
-		onclick="setInterval(getTwitterData, 20000)" />
-	<div id="chartdiv" style="width: 1280px; height: 400px;"></div>
-	<div align="center" hidden="false" id="data">
-		<table border="1" id="mytable">
-			<tbody>
-				<tr>
-					<th>Location</th>
-					<th>Count</th>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+		onclick="getTwitterData()" />
+	<!--setInterval(getTwitterData, 20000)  -->
+	<div id="chartdiv" style="float: right; width: 640px; height: 400px;"></div>
+	<div id="linediv" style="float: right; width: 640px; height: 800px;"></div>
 </body>
 </html>

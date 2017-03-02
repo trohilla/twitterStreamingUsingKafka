@@ -35,10 +35,10 @@ public class TwitterStreamProducer {
 	public void run(String topicName,String filter)
 			throws InterruptedException {
 		
-		String consumerKey = "";
-		String consumerSecret = "";
-		String token = "";
-		String secret = "";
+		String consumerKey = "7OOHTBQOCmxVEdvwlpeX34DZP";
+		String consumerSecret = "q4B5gV4MkWyykNSbpMspd5jTRAxf1DaceNJ32ENQknUGjNJMA9";
+		String token = "260644023-aDKdyhJrxyYBw35cDW34Z61svXwNQ2s1oCwuEp0U";
+		String secret = "uZOTl81gmkeIoxVzkiH6zzH77GwIWYtQN16XnorPQXw7Y";
 		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 		// add some track terms
@@ -62,7 +62,7 @@ public class TwitterStreamProducer {
 		Producer<String, String> producer = new KafkaProducer<String, String>(props);
 
 		// Do whatever needs to be done with messages
-		for (int msgRead = 0; msgRead < 10; msgRead++) {
+		for (int msgRead = 0; msgRead < 100; msgRead++) {
 			String msg = queue.take();
 			System.out.println(msgRead + "  " + msg);
 			producer.send(new ProducerRecord<String, String>(topicName, String.valueOf(msgRead), msg));
