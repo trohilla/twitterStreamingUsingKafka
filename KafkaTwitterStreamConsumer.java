@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.tushar.kafka.core.UserLocation;
 
@@ -24,6 +27,8 @@ public class KafkaTwitterStreamConsumer {
 
 	private String groupName = "SimpleTopicGroup";
 	private ConsumerConnector consumerConnector = null;
+	private Logger logger=LoggerFactory.getLogger(KafkaTwitterStreamConsumer.class);
+	private static final Integer DATA_CONSUMED=10;
 
 	/**
 	 * To initialize the property and consumerConnector object, so as to consume
@@ -62,7 +67,7 @@ public class KafkaTwitterStreamConsumer {
 		// Iterate stream using ConsumerIterator
 		for (final KafkaStream<byte[], byte[]> kStreams : kStreamList) {
 			ConsumerIterator<byte[], byte[]> consumerIte = kStreams.iterator();
-			while (consumerIte.hasNext() && locations.size()<50) {
+			while (consumerIte.hasNext() && locations.size()<DATA_CONSUMED) {
 				final MessageAndMetadata<byte[], byte[]> data = consumerIte.next();
 				final String value = parseByteArray(data.message());
 				final Long count = new Long(value);
@@ -83,7 +88,7 @@ public class KafkaTwitterStreamConsumer {
 	private static String parseByteArray(byte[] array) {
 		String value = Arrays.toString(array);
 		return new String(value.substring(1, value.length() - 1)
-				.replaceAll(",", "").replaceAll("-", "").replaceAll("\\s+", "").trim());
+				.replaceAll(",", "").replace("-", "").replaceAll("\\s+", "").trim());
 	}
 
 	/**
@@ -95,4 +100,5 @@ public class KafkaTwitterStreamConsumer {
 		consumer.initialize();
 		return consumer.consume(topic);
 	}
+	
 }

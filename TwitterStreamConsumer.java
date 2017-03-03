@@ -12,7 +12,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 public class TwitterStreamConsumer {
 
-	String topicName = "my-output-topic";
 	String groupName = "SimpleTopicGroup";
 	KafkaConsumer<String, String> consumer = null;
 
@@ -25,7 +24,7 @@ public class TwitterStreamConsumer {
 		consumer = new KafkaConsumer<String, String>(props);
 	}
 
-	public void consume(){
+	public void consume(String topicName){
 	    
 	    consumer.subscribe(Arrays.asList(topicName));
 	    System.out.println("Subscribed to topic " + topicName);
@@ -35,7 +34,8 @@ public class TwitterStreamConsumer {
 	            for (ConsumerRecord<String, String> record : records){
 	            		//Status status=(Status)record.value();
 	            		final String location=record.key();
-	                    System.out.println("Location = " +location);
+	            		final String tweets=record.value();
+	                    System.out.println("Location = " +location +"Tweet ="+tweets);
 	            }
 	    }
 	}
@@ -62,7 +62,7 @@ public class TwitterStreamConsumer {
 
 		consumer.initialize();
 
-		consumer.consume();
+		consumer.consume("ipl");
 
 	}
 

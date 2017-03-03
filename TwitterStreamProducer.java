@@ -32,9 +32,8 @@ import com.twitter.hbc.httpclient.auth.OAuth1;
 
 public class TwitterStreamProducer {
 
-	public void run(String topicName,String filter)
-			throws InterruptedException {
-		
+	public void run(String filter) throws InterruptedException {
+
 		String consumerKey = "7OOHTBQOCmxVEdvwlpeX34DZP";
 		String consumerSecret = "q4B5gV4MkWyykNSbpMspd5jTRAxf1DaceNJ32ENQknUGjNJMA9";
 		String token = "260644023-aDKdyhJrxyYBw35cDW34Z61svXwNQ2s1oCwuEp0U";
@@ -65,9 +64,9 @@ public class TwitterStreamProducer {
 		for (int msgRead = 0; msgRead < 100; msgRead++) {
 			String msg = queue.take();
 			System.out.println(msgRead + "  " + msg);
-			producer.send(new ProducerRecord<String, String>(topicName, String.valueOf(msgRead), msg));
+			producer.send(new ProducerRecord<String, String>(filter+"input", String.valueOf(msgRead), msg));
 		}
-		
+
 		producer.close();
 		client.stop();
 

@@ -43,7 +43,7 @@ public class TwitterStream {
 		// final Serde<String> stringSerde = Serdes.String();
 		// final Serde<Long> longSerde = Serdes.Long();
 		KStreamBuilder builder = new KStreamBuilder();
-		KStream<String, String> source = builder.stream(topicName);
+		KStream<String, String> source = builder.stream(topicName+"input");
 
 		// KStream<String, Object> mapped=source.mapValues(record ->
 		// Integer.valueOf(record.length()).toString());
@@ -54,7 +54,7 @@ public class TwitterStream {
 		counts.foreach(TwitterStream::populateLocations);
 
 		// need to override value serde to Long type
-		counts.to(Serdes.String(), Serdes.Long(), "my-output-topic");
+		counts.to(Serdes.String(), Serdes.Long(), topicName);
 
 		KafkaStreams streams = new KafkaStreams(builder, props);
 		streams.start();

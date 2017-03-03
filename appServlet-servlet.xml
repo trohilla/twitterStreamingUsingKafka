@@ -20,6 +20,8 @@
 	<context:annotation-config />
 	<bean name="streamService" class="com.tushar.kafka.twitter.KafkaTwitterStreamConsumer" />
 	
+	<bean name="main" class="com.tushar.kafka.twitter.TwitterStreamProducerMain" />
+	
 	<!-- Configure to plugin JSON as request and response in method handler -->
 	<bean
 		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">

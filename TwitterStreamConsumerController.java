@@ -21,22 +21,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tushar.kafka.core.UserLocation;
 import com.tushar.kafka.twitter.KafkaTwitterStreamConsumer;
+import com.tushar.kafka.twitter.TwitterStreamProducerMain;
 
 @Controller
 public class TwitterStreamConsumerController {
 
-	//private Logger logger = LoggerFactory.getLogger(TwitterStreamConsumerController.class);
+	private Logger logger = LoggerFactory.getLogger(TwitterStreamConsumerController.class);
+	
 	@Autowired
-	@Qualifier(value="streamService")
+	@Qualifier(value="main")
+	private TwitterStreamProducerMain main;
+	
+	@Autowired
+	@Qualifier(value = "streamService")
 	private KafkaTwitterStreamConsumer streamService;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getTwitterAnalysis/{topicName}")
 	@ResponseBody
-	public List<UserLocation> getTwitterData(@PathVariable("topicName") String topicName) //throws ValidationException 
-	{
-		//if (null == topicName || "".equals(topicName))
-			//throw new ValidationException("Topic name should not be empty");
-		//logger.info("Getting data for topic {}", topicName);
+	public List<UserLocation> getTwitterData(@PathVariable("topicName") String topicName) throws ValidationException {
+		if (null == topicName || " ".equals(topicName))
+			throw new ValidationException("Topic name should not be empty");
+		logger.info("Getting data for topic {}", topicName);
 		List<UserLocation> locations = null;
 		try {
 			locations = streamService.consumeFromTopic(topicName);
@@ -47,6 +52,16 @@ public class TwitterStreamConsumerController {
 		return locations;
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/startTwitterAnalysis/{topicName}")
+	@ResponseBody
+	public String startStreaming(@PathVariable("topicName") String topicName) throws ValidationException {
+		if (null == topicName || " ".equals(topicName))
+			throw new ValidationException("Topic name should not be empty or null");
+		logger.info("Producing data for topic {}", topicName);
+		main.startProducerAndStream(topicName);
+		return "started";
+	}
+
 	@ExceptionHandler(ValidationException.class)
 	@ResponseBody
 	public Map<String, String> errorResponse(Exception ex, HttpServletResponse response) {
@@ -55,7 +70,6 @@ public class TwitterStreamConsumerController {
 		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		return errorMap;
 	}
-	
 
 	@RequestMapping(method = RequestMethod.GET, value = "index")
 	public String getFirstPage() {

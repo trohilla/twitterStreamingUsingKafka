@@ -16,21 +16,12 @@ public class TwitterStreamProducerMain {
 	private static ExecutorService executor = null;
 	private static volatile Future taskOneResults = null;
 	private static volatile Future taskTwoResults = null;
-
-	public static void main(String[] args) {
-
+	
+	public TwitterStreamProducerMain() {
 		executor = Executors.newFixedThreadPool(2);
-		while (true) {
-			try {
-				checkTasks(args[0], args[1]);
-				Thread.sleep(1000);
-			} catch (Exception e) {
-				System.err.println("Caught exception: " + e.getMessage());
-			}
-		}
 	}
 
-	private static void checkTasks(String topicName, String filter) throws Exception {
+	public static void startProducerAndStream(String filter) {
 		if (taskOneResults == null || taskOneResults.isDone() || taskOneResults.isCancelled()) {
 			taskOneResults = executor.submit(new Runnable() {
 
@@ -38,7 +29,7 @@ public class TwitterStreamProducerMain {
 				public void run() {
 					while (true) {
 						try {
-							producerService.run(topicName, filter);
+							producerService.run(filter);
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -61,7 +52,7 @@ public class TwitterStreamProducerMain {
 				public void run() {
 					while (true) {
 						try {
-							stream.start(topicName);
+							stream.start(filter);
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -77,4 +68,5 @@ public class TwitterStreamProducerMain {
 			});
 		}
 	}
+	
 }
